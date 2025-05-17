@@ -35,6 +35,17 @@ The model is trained on a dataset containing labeled examples of various sports,
    pip install -r requirements.txt
    ```
 
+4. **Install Data through this link**
+
+   ```bash
+   wget https://drive.google.com/file/d/1ga8mIZKBsWP71wp61A49QdNOieZP73qb/view?usp=drive_link
+   ```
+5. **Extract data**
+   ```bash
+   unzip sports.zip
+   ```
+
+
 ## 🚀 Usage
 
 1. **Running Predictions:**

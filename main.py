@@ -17,15 +17,15 @@ MAP = {}
 
 def main():
 
-    # Load data csv into a dataframe object
+    # Load  csv that contains the data into a dataframe object
     df = pd.read_csv('data/sports.csv')
     MAP = map_class_id_to_label(df)
 
     # Get image arrays and labels for all image files
     images, class_ids = load_data(df)
+    class_ids = tf.keras.utils.to_categorical(class_ids)
 
     # Split data into training and testing sets
-    class_ids = tf.keras.utils.to_categorical(class_ids)
     x_train, x_test, y_train, y_test = train_test_split(
         np.array(images), np.array(class_ids), test_size=TEST_SIZE
     )
@@ -85,6 +85,7 @@ def get_model():
     base_model = EfficientNetB0(input_shape=(
         IMG_HEIGHT, IMG_WIDTH, 3), include_top=False, weights='imagenet')
     base_model.trainable = False
+
     model = tf.keras.models.Sequential([
         base_model,
         keras.layers.GlobalAveragePooling2D(),
