@@ -17,6 +17,7 @@ MAP = {}
 
 def main():
 
+    global MAP
     # Load  csv that contains the data into a dataframe object
     df = pd.read_csv('data/sports.csv')
     MAP = map_class_id_to_label(df)
@@ -65,13 +66,18 @@ def load_data(df: pd.DataFrame):
     images = []
     class_ids = []
     for path, class_id in zip(df['filepaths'], df['class id']):
-        image = get_image("data/" + path)
+        image = cv2.imread("data/"+path)
+        image = cv2.resize(image, (IMG_WIDTH, IMG_HEIGHT))
         images.append(image)
         class_ids.append(class_id)
     return (images, class_ids)
 
 
 def predict(model, image):
+    global MAP
+    if len(MAP) == 0:
+        MAP = map_class_id_to_label(pd.read_csv('data/sports.csv'))
+
     predicted_class = np.argmax(model.predict(image)[0])
     print(f"Predicted class is {MAP[predicted_class]}")
 
