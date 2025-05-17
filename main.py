@@ -32,7 +32,7 @@ def main():
     )
 
     # Get a compiled neural network
-    model = get_model()
+    model = get_model_with_softmax()
 
     # Fit model on training data
     model.fit(x_train, y_train, epochs=EPOCHS)
@@ -47,7 +47,7 @@ def main():
 def get_image(image_path):
     image = cv2.imread(image_path)
     image = cv2.resize(image, (IMG_WIDTH, IMG_HEIGHT))
-    image = np.expand_dims(image, axis=0)
+    image = np.expand_dims(image, axis=0) 
     return image
 
 
@@ -82,7 +82,7 @@ def predict(model, image):
     print(f"Predicted class is {MAP[predicted_class]}")
 
 
-def get_model():
+def get_model_with_softmax():
     """
     Returns a compiled convolutional neural network model. Assume that the
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
@@ -97,17 +97,98 @@ def get_model():
         keras.layers.GlobalAveragePooling2D(),
         keras.layers.Dense(128, activation="relu"),
         keras.layers.Dropout(0.5),
-        keras.layers.Dense(NUM_CATEGORIES, activation='softmax')
-
+        keras.layers.Dense(NUM_CATEGORIES, activation='softmax') 
     ])
 
     model.compile(
         optimizer="adam",
-        loss="binary_crossentropy",
+        loss="binary_crossentropy", # loss function
         metrics=["accuracy"]
     )
     return model
 
+
+
+
+def get_model_with_sigmoid():
+    """
+    Returns a compiled convolutional neural network model. Assume that the
+    `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
+    The output layer should have `NUM_CATEGORIES` units, one for each category.
+    """
+    base_model = EfficientNetB0(input_shape=(
+        IMG_HEIGHT, IMG_WIDTH, 3), include_top=False, weights='imagenet')
+    base_model.trainable = False
+
+    model = tf.keras.models.Sequential([
+        base_model,
+        keras.layers.GlobalAveragePooling2D(),
+        keras.layers.Dense(128, activation="relu"),
+        keras.layers.Dropout(0.5),
+        keras.layers.Dense(NUM_CATEGORIES, activation='sigmoid') 
+    ])
+
+    model.compile(
+        optimizer="adam",
+        loss="binary_crossentropy", # loss function
+        metrics=["accuracy"]
+    )
+    return model
+
+
+
+def get_model_with_relu():
+    """
+    Returns a compiled convolutional neural network model. Assume that the
+    `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
+    The output layer should have `NUM_CATEGORIES` units, one for each category.
+    """
+    base_model = EfficientNetB0(input_shape=(
+        IMG_HEIGHT, IMG_WIDTH, 3), include_top=False, weights='imagenet')
+    base_model.trainable = False
+
+    model = tf.keras.models.Sequential([
+        base_model,
+        keras.layers.GlobalAveragePooling2D(),
+        keras.layers.Dense(128, activation="relu"),
+        keras.layers.Dropout(0.5),
+        keras.layers.Dense(NUM_CATEGORIES, activation='relu') 
+    ])
+
+    model.compile(
+        optimizer="adam",
+        loss="binary_crossentropy", # loss function
+        metrics=["accuracy"]
+    )
+    return model
+
+
+
+
+def get_model_with_softmax():
+    """
+    Returns a compiled convolutional neural network model. Assume that the
+    `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
+    The output layer should have `NUM_CATEGORIES` units, one for each category.
+    """
+    base_model = EfficientNetB0(input_shape=(
+        IMG_HEIGHT, IMG_WIDTH, 3), include_top=False, weights='imagenet')
+    base_model.trainable = False
+
+    model = tf.keras.models.Sequential([
+        base_model,
+        keras.layers.GlobalAveragePooling2D(),
+        keras.layers.Dense(128, activation="relu"),
+        keras.layers.Dropout(0.5),
+        keras.layers.Dense(NUM_CATEGORIES, activation='softmax') # categorization softmax
+    ])
+
+    model.compile(
+        optimizer="adam",
+        loss="binary_crossentropy", # loss function
+        metrics=["accuracy"]
+    )
+    return model
 
 def load_model(model_path):
     model = tf.keras.models.load_model(model_path)
@@ -121,4 +202,4 @@ def test(image_path, model_path='model.h5'):
 
 
 if __name__ == "__main__":
-    main()
+    get_image('data/test/baseball/1.jpg')
