@@ -24,7 +24,6 @@ def main():
 
     # Get image arrays and labels for all image files
     images, class_ids = load_data(df)
-    class_ids = tf.keras.utils.to_categorical(class_ids)
 
     # Split data into training and testing sets
     x_train, x_test, y_train, y_test = train_test_split(
@@ -32,16 +31,26 @@ def main():
     )
 
     # Get a compiled neural network
-    model = get_model_with_softmax()
+    model_relu = get_model_with_relu_hidden_layer()
+    model_tanh = get_model_with_tanh_hidden_layer()
 
     # Fit model on training data
-    model.fit(x_train, y_train, epochs=EPOCHS)
+    print(f'training relu model ...')
+    model_relu.fit(x_train, y_train, epochs=EPOCHS)
+
+    print(f'training tanh model ...')
+    model_tanh.fit(x_train, y_train, epochs=EPOCHS)
 
     # Evaluate neural network performance
-    model.evaluate(x_test,  y_test, verbose=2)
+    print(f"relu model evaluation: ")
+    model_relu.evaluate(x_test,  y_test, verbose=2)
 
-    model.save("model.h5")
-    print(f"Model saved to {model}.")
+    print(f"tanh model evaluation: ")
+    
+
+    model_relu.save("model_relu.h5")
+    model_tanh.save('model_tanh.h5')
+    print(f"Saved Models")
 
 
 def get_image(image_path):
@@ -60,7 +69,7 @@ def map_class_id_to_label(df: pd.DataFrame):
 
 def load_data(df: pd.DataFrame):
     """
-        loads data from a dataframe that has an image label 
+        loads data from a dataframe that has an image class 
         and the associated image file path
     """
     images = []
@@ -82,7 +91,7 @@ def predict(model, image):
     print(f"Predicted class is {MAP[predicted_class]}")
 
 
-def get_model_with_softmax():
+def get_model_with_relu_hidden_layer():
     """
     Returns a compiled convolutional neural network model. Assume that the
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
@@ -102,7 +111,7 @@ def get_model_with_softmax():
 
     model.compile(
         optimizer="adam",
-        loss="binary_crossentropy", # loss function
+        loss="sparse_categorical_crossentropy", # loss function
         metrics=["accuracy"]
     )
     return model
@@ -110,7 +119,7 @@ def get_model_with_softmax():
 
 
 
-def get_model_with_sigmoid():
+def get_model_with_tanh_hidden_layer():
     """
     Returns a compiled convolutional neural network model. Assume that the
     `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
@@ -123,69 +132,14 @@ def get_model_with_sigmoid():
     model = tf.keras.models.Sequential([
         base_model,
         keras.layers.GlobalAveragePooling2D(),
-        keras.layers.Dense(128, activation="relu"),
+        keras.layers.Dense(128, activation="tanh"),
         keras.layers.Dropout(0.5),
-        keras.layers.Dense(NUM_CATEGORIES, activation='sigmoid') 
+        keras.layers.Dense(NUM_CATEGORIES, activation='softmax') 
     ])
 
     model.compile(
         optimizer="adam",
-        loss="binary_crossentropy", # loss function
-        metrics=["accuracy"]
-    )
-    return model
-
-
-
-def get_model_with_relu():
-    """
-    Returns a compiled convolutional neural network model. Assume that the
-    `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
-    The output layer should have `NUM_CATEGORIES` units, one for each category.
-    """
-    base_model = EfficientNetB0(input_shape=(
-        IMG_HEIGHT, IMG_WIDTH, 3), include_top=False, weights='imagenet')
-    base_model.trainable = False
-
-    model = tf.keras.models.Sequential([
-        base_model,
-        keras.layers.GlobalAveragePooling2D(),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dropout(0.5),
-        keras.layers.Dense(NUM_CATEGORIES, activation='relu') 
-    ])
-
-    model.compile(
-        optimizer="adam",
-        loss="binary_crossentropy", # loss function
-        metrics=["accuracy"]
-    )
-    return model
-
-
-
-
-def get_model_with_softmax():
-    """
-    Returns a compiled convolutional neural network model. Assume that the
-    `input_shape` of the first layer is `(IMG_WIDTH, IMG_HEIGHT, 3)`.
-    The output layer should have `NUM_CATEGORIES` units, one for each category.
-    """
-    base_model = EfficientNetB0(input_shape=(
-        IMG_HEIGHT, IMG_WIDTH, 3), include_top=False, weights='imagenet')
-    base_model.trainable = False
-
-    model = tf.keras.models.Sequential([
-        base_model,
-        keras.layers.GlobalAveragePooling2D(),
-        keras.layers.Dense(128, activation="relu"),
-        keras.layers.Dropout(0.5),
-        keras.layers.Dense(NUM_CATEGORIES, activation='softmax') # categorization softmax
-    ])
-
-    model.compile(
-        optimizer="adam",
-        loss="binary_crossentropy", # loss function
+        loss="sparse_categorical_crossentropy", # loss function
         metrics=["accuracy"]
     )
     return model
@@ -202,4 +156,4 @@ def test(image_path, model_path='model.h5'):
 
 
 if __name__ == "__main__":
-    get_image('data/test/baseball/1.jpg')
+    main()
