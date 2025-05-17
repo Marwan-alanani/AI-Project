@@ -34,6 +34,10 @@ def main():
     model_relu = get_model_with_relu_hidden_layer()
     model_tanh = get_model_with_tanh_hidden_layer()
 
+    #Print Model summaries (layers)
+    print(model_relu.summary())
+    print(model_tanh.summary())
+
     # Fit model on training data
     print(f'training relu model ...')
     model_relu.fit(x_train, y_train, epochs=EPOCHS)
@@ -149,7 +153,7 @@ def load_model(model_path):
     return model
 
 
-def test(image_path, model_path='model.h5'):
+def test(image_path, model_path):
     model = load_model(model_path)
     image = get_image(image_path)
     predict(model, image)
