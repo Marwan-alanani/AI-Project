@@ -34,7 +34,7 @@ def main():
     model_relu = get_model_with_relu_hidden_layer()
     model_tanh = get_model_with_tanh_hidden_layer()
 
-    #Print Model summaries (layers)
+    # Print Model summaries (layers)
     print(model_relu.summary())
     print(model_tanh.summary())
 
@@ -50,7 +50,6 @@ def main():
     model_relu.evaluate(x_test,  y_test, verbose=2)
 
     print(f"tanh model evaluation: ")
-    
 
     model_relu.save("model_relu.h5")
     model_tanh.save('model_tanh.h5')
@@ -60,7 +59,7 @@ def main():
 def get_image(image_path):
     image = cv2.imread(image_path)
     image = cv2.resize(image, (IMG_WIDTH, IMG_HEIGHT))
-    image = np.expand_dims(image, axis=0) 
+    image = np.expand_dims(image, axis=0)
     return image
 
 
@@ -110,17 +109,15 @@ def get_model_with_relu_hidden_layer():
         keras.layers.GlobalAveragePooling2D(),
         keras.layers.Dense(128, activation="relu"),
         keras.layers.Dropout(0.5),
-        keras.layers.Dense(NUM_CATEGORIES, activation='softmax') 
+        keras.layers.Dense(NUM_CATEGORIES, activation='softmax')
     ])
 
     model.compile(
         optimizer="adam",
-        loss="sparse_categorical_crossentropy", # loss function
+        loss="sparse_categorical_crossentropy",  # loss function
         metrics=["accuracy"]
     )
     return model
-
-
 
 
 def get_model_with_tanh_hidden_layer():
@@ -138,15 +135,16 @@ def get_model_with_tanh_hidden_layer():
         keras.layers.GlobalAveragePooling2D(),
         keras.layers.Dense(128, activation="tanh"),
         keras.layers.Dropout(0.5),
-        keras.layers.Dense(NUM_CATEGORIES, activation='softmax') 
+        keras.layers.Dense(NUM_CATEGORIES, activation='softmax')
     ])
 
     model.compile(
         optimizer="adam",
-        loss="sparse_categorical_crossentropy", # loss function
+        loss="sparse_categorical_crossentropy",  # loss function
         metrics=["accuracy"]
     )
     return model
+
 
 def load_model(model_path):
     model = tf.keras.models.load_model(model_path)
